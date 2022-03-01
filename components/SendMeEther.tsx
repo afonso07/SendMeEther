@@ -14,6 +14,11 @@ const SendMeEther = () => {
   const [referenceElement, setReferenceElement] = useState<any>(null);
   const [popperElement, setPopperElement] = useState<any>(null);
   const [arrowElement, setArrowElement] = useState<any>(null);
+  const [inputRef, setInputRef] = useState<any>(null);
+
+  const [etherInput, setEtherInput] = useState<string>("");
+
+  const [etherClicked, setEtherClicked] = useState<boolean>(false);
 
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     modifiers: [
@@ -66,7 +71,25 @@ const SendMeEther = () => {
     <div className={css_styles.main}>
       <div className={css_styles.title_container}>
         <div className={css_styles.title}>
-          SendMe<span>Ether</span>
+          SendMe
+          <span
+            onClick={() => {
+              setEtherClicked(true);
+              inputRef.focus();
+              console.log(etherInput.length);
+            }}
+          >
+            <input
+              className={css_styles.input_style}
+              onChange={(e) => setEtherInput(e.target.value)}
+              style={{ width: `${etherInput?.length || 1}ch`, opacity: 0 }}
+              ref={setInputRef}
+            ></input>
+            <span style={{ width: `${etherInput?.length || 1}ch` }}>
+              {!(etherClicked && etherInput.length > 0) ? "_" : etherInput}
+            </span>
+          </span>
+          <span>Ether</span>
         </div>
         <div className={css_styles.account_wrapper} ref={setReferenceElement}>
           {DevAccount}
@@ -78,7 +101,11 @@ const SendMeEther = () => {
           className={css_styles.tooltip_tooltip}
         >
           Click here to Send Ether!
-          <div className={css_styles.tooltip_arrow} ref={setArrowElement} style={styles.arrow} />
+          <div
+            className={css_styles.tooltip_arrow}
+            ref={setArrowElement}
+            style={styles.arrow}
+          />
         </div>
       </div>
     </div>
