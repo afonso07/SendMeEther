@@ -55,6 +55,17 @@
 
 }
 
+.input_underscore{
+    animation: input_blink 0.5s infinite;
+    animation-direction: alternate;
+}
+
+@keyframes input_blink {
+    
+    0% {opacity: 1;}
+    100% {opacity: 0;}
+  }
+
 /* ? Tooltip styles */
 .tooltip_tooltip {
     width: fit-content;

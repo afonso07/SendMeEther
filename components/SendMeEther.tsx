@@ -65,7 +65,10 @@ const SendMeEther = () => {
       }
     };
     providerCheck();
-  }, []);
+
+    inputRef?.focus();
+    setEtherClicked(true);
+  }, [inputRef]);
 
   return provider && netConfig?.is_main ? (
     <div className={css_styles.main}>
@@ -76,7 +79,6 @@ const SendMeEther = () => {
             onClick={() => {
               setEtherClicked(true);
               inputRef.focus();
-              console.log(etherInput.length);
             }}
           >
             <input
@@ -86,7 +88,11 @@ const SendMeEther = () => {
               ref={setInputRef}
             ></input>
             <span style={{ width: `${etherInput?.length || 1}ch` }}>
-              {!(etherClicked && etherInput.length > 0) ? "_" : etherInput}
+              {!(etherClicked && etherInput.length > 0) ? (
+                <span className={css_styles.input_underscore}>_</span>
+              ) : (
+                etherInput
+              )}
             </span>
           </span>
           <span>Ether</span>
