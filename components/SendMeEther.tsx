@@ -3,6 +3,8 @@ import detectEthereumProvider from "@metamask/detect-provider";
 import Web3 from "web3";
 import css_styles from "../styles/SendMeEther.module.css";
 import { usePopper } from "react-popper";
+import { TransactionReceipt } from "web3-core";
+var gtag: any = require("ga-gtag");
 
 const SendMeEther = () => {
   const [provider, setProvider] = useState<any>(null);
@@ -40,11 +42,17 @@ const SendMeEther = () => {
     if (!regex_number.test(etherInput)) {
       return;
     }
-    await netConfig?.web3.eth.sendTransaction({
-      to: _dev_account,
-      from: netConfig.account,
-      value: netConfig.web3.utils.toWei(etherInput, "ether"),
-    });
+    await netConfig?.web3.eth
+      .sendTransaction({
+        to: _dev_account,
+        from: netConfig.account,
+        value: netConfig.web3.utils.toWei(etherInput, "ether"),
+      })
+      .once("receipt", (reciept: TransactionReceipt) => {
+        gtag("event", "Sent a Donation", {
+          account: netConfig.account,
+        });
+      });
   };
 
   const popper_address = usePopper(referenceElement, popperElement, {
@@ -93,6 +101,12 @@ const SendMeEther = () => {
           account: accounts[0],
           web3: web3,
         }));
+
+        if (accounts[0]) {
+          gtag("event", "Linked Metamask", {
+            account: accounts[0],
+          });
+        }
       }
     };
     console.log("Hmmmm... What are you doing here? Just send some ETH!");
