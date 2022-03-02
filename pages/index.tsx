@@ -7,6 +7,10 @@ import styles from "../styles/Home.module.css";
 const Home: NextPage = () => {
   return (
     <div className={styles.container}>
+      <Head>
+        <title>SendMeEth</title>
+        <meta property="og:title" content="My page title" key="title" />
+      </Head>
       <SendMeEther />
     </div>
   );

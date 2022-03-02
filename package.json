@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build && next export",
+    "build_pin": "next build && next export && pinbase deploy",
     "start": "next start",
     "lint": "next lint"
   },
