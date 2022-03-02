@@ -9,6 +9,7 @@ const SendMeEther = () => {
   const [netConfig, setNetConfig] = useState<{
     is_main?: Boolean;
     account: string;
+    web3: Web3;
   } | null>(null);
 
   const [referenceElement, setReferenceElement] = useState<any>(null);
@@ -19,6 +20,28 @@ const SendMeEther = () => {
   const [etherInput, setEtherInput] = useState<string>("");
 
   const [etherClicked, setEtherClicked] = useState<boolean>(false);
+
+  const _dev_account: string = "0x4cf9394F6A5F884B5A7Fc00490F9161A7a68F291";
+
+  const regex_number: RegExp = /^\d+$/g;
+
+  const DevAccount = (
+    <div>
+      <span>0x</span>
+      <span>4cf9394F6A5F884B5A7Fc00490F9161A7a68F291</span>
+    </div>
+  );
+
+  const transactionCallback = async (): Promise<void> => {
+    if (!regex_number.test(etherInput)) {
+      return;
+    }
+    await netConfig?.web3.eth.sendTransaction({
+      to: _dev_account,
+      from: netConfig.account,
+      value: netConfig.web3.utils.toWei(etherInput, "ether"),
+    });
+  };
 
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     modifiers: [
@@ -38,13 +61,6 @@ const SendMeEther = () => {
     ],
   });
 
-  const DevAccount = (
-    <div>
-      <span>0x</span>
-      <span>4cf9394F6A5F884B5A7Fc00490F9161A7a68F291</span>
-    </div>
-  );
-
   useEffect(() => {
     const providerCheck = async (): Promise<void> => {
       const provider: any = await detectEthereumProvider();
@@ -61,6 +77,7 @@ const SendMeEther = () => {
           ...rest,
           is_main: networkType == "main",
           account: accounts[0],
+          web3: web3,
         }));
       }
     };
@@ -71,7 +88,12 @@ const SendMeEther = () => {
   }, [inputRef]);
 
   return provider && netConfig?.is_main ? (
-    <div className={css_styles.main}>
+    <div
+      className={css_styles.main}
+      onKeyPress={(event) =>
+        event.key == "Enter" ? transactionCallback() : null
+      }
+    >
       <div className={css_styles.title_container}>
         <div className={css_styles.title}>
           SendMe
@@ -97,7 +119,11 @@ const SendMeEther = () => {
           </span>
           <span>Ether</span>
         </div>
-        <div className={css_styles.account_wrapper} ref={setReferenceElement}>
+        <div
+          className={css_styles.account_wrapper}
+          ref={setReferenceElement}
+          onClick={transactionCallback}
+        >
           {DevAccount}
         </div>
         <div
@@ -116,7 +142,14 @@ const SendMeEther = () => {
       </div>
     </div>
   ) : (
-    <div>Please install MetaMask and connect to the Main Net!</div>
+    <div className={css_styles.main}>
+      <div className={css_styles.title}>
+        <div className={css_styles.unavailable}>
+          Please install <span>MetaMask</span> and connect to the{" "}
+          <span>Main Net!</span>
+        </div>
+      </div>
+    </div>
   );
 };
 
