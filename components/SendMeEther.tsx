@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
 import detectEthereumProvider from "@metamask/detect-provider";
 import Web3 from "web3";
 import css_styles from "../styles/SendMeEther.module.css";
@@ -13,6 +13,7 @@ const SendMeEther = () => {
   } | null>(null);
 
   const [referenceElement, setReferenceElement] = useState<any>(null);
+
   const [popperElement, setPopperElement] = useState<any>(null);
   const [arrowElement, setArrowElement] = useState<any>(null);
   const [inputRef, setInputRef] = useState<any>(null);
@@ -20,10 +21,13 @@ const SendMeEther = () => {
   const [etherInput, setEtherInput] = useState<string>("");
 
   const [etherClicked, setEtherClicked] = useState<boolean>(false);
+  const [etherFocused, setEtherFocused] = useState<boolean>(false);
+
+  const titleRef = useRef(null);
 
   const _dev_account: string = "0x4cf9394F6A5F884B5A7Fc00490F9161A7a68F291";
 
-  const regex_number: RegExp = /^\d+$/g;
+  const regex_number: RegExp = /^([0-9]+\.?[0-9]*|\.[0-9]+)$/g;
 
   const DevAccount = (
     <div>
@@ -43,7 +47,7 @@ const SendMeEther = () => {
     });
   };
 
-  const { styles, attributes } = usePopper(referenceElement, popperElement, {
+  const popper_address = usePopper(referenceElement, popperElement, {
     modifiers: [
       { name: "arrow", options: { element: arrowElement } },
       {
@@ -60,6 +64,16 @@ const SendMeEther = () => {
       },
     ],
   });
+
+  useOutsideAlerter(titleRef, () => {
+    setEtherFocused(false);
+  });
+
+  useLayoutEffect(() => {
+    if (etherFocused == false) {
+      popper_address.update ? popper_address.update() : null;
+    }
+  }, [etherFocused == false]);
 
   useEffect(() => {
     const providerCheck = async (): Promise<void> => {
@@ -81,6 +95,8 @@ const SendMeEther = () => {
         }));
       }
     };
+    console.log("Hmmmm... What are you doing here? Just send some ETH!");
+
     providerCheck();
 
     inputRef?.focus();
@@ -95,19 +111,28 @@ const SendMeEther = () => {
       }
     >
       <div className={css_styles.title_container}>
-        <div className={css_styles.title}>
+        <div
+          className={css_styles.title}
+          onClick={() => {
+            setEtherClicked(true);
+            inputRef.focus();
+            popper_address.update ? popper_address.update() : null;
+          }}
+          ref={titleRef}
+        >
           SendMe
-          <span
-            onClick={() => {
-              setEtherClicked(true);
-              inputRef.focus();
-            }}
-          >
+          <span>
             <input
               className={css_styles.input_style}
-              onChange={(e) => setEtherInput(e.target.value)}
+              onChange={(e) => {
+                setEtherInput(e.target.value);
+                popper_address.update ? popper_address.update() : null;
+              }}
               style={{ width: `${etherInput?.length || 1}ch`, opacity: 0 }}
               ref={setInputRef}
+              onFocus={() => {
+                setEtherFocused(true);
+              }}
             ></input>
             <span style={{ width: `${etherInput?.length || 1}ch` }}>
               {!(etherClicked && etherInput.length > 0) ? (
@@ -119,6 +144,11 @@ const SendMeEther = () => {
           </span>
           <span>Ether</span>
         </div>
+        {!etherFocused ? (
+          <div className={css_styles.subtitle}>Click above to start typing</div>
+        ) : !etherInput ? (
+          <div className={css_styles.subtitle}>Start typing!</div>
+        ) : null}
         <div
           className={css_styles.account_wrapper}
           ref={setReferenceElement}
@@ -128,15 +158,15 @@ const SendMeEther = () => {
         </div>
         <div
           ref={setPopperElement}
-          style={styles.popper}
-          {...attributes.popper}
+          style={popper_address.styles.popper}
+          {...popper_address.attributes.popper}
           className={css_styles.tooltip_tooltip}
         >
           Click here to Send Ether!
           <div
             className={css_styles.tooltip_arrow}
             ref={setArrowElement}
-            style={styles.arrow}
+            style={popper_address.styles.arrow}
           />
         </div>
       </div>
@@ -152,5 +182,26 @@ const SendMeEther = () => {
     </div>
   );
 };
+
+// ? Hook that detects outside clicks
+function useOutsideAlerter(ref: any, stateChange: () => void) {
+  useEffect(() => {
+    /**
+     * Alert if clicked on outside of element
+     */
+    function handleClickOutside(event: Event) {
+      if (ref.current && !ref.current.contains(event.target)) {
+        stateChange();
+      }
+    }
+
+    // Bind the event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Unbind the event listener on clean up
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [ref]);
+}
 
 export default SendMeEther;

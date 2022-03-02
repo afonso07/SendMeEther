@@ -11,6 +11,20 @@
     font-family: 'Sora', sans-serif;
     font-weight: 800;
     opacity: 0.8;
+    cursor: pointer;
+
+}
+
+.subtitle {
+    width: 100%;
+    text-align: center;
+    font-family: 'Sora', sans-serif;
+    color: cornflowerblue;
+    font-weight: 800;
+    opacity: 0.6;
+    margin: 0.3rem;
+
+
 }
 
 .unavailable {
