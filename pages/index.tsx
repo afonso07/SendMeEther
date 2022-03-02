@@ -12,6 +12,7 @@ const Home: NextPage = () => {
         <meta property="og:title" content="My page title" key="title" />
       </Head>
       <SendMeEther />
+      <div className={styles.footer_biscuit}><a href="https://www.linkedin.com/in/afonso-lopo-de-carvalho">@Afonso Lopo de Carvalho</a></div>
     </div>
   );
 };
