@@ -4,7 +4,6 @@ import Web3 from "web3";
 import css_styles from "../styles/SendMeEther.module.css";
 import { usePopper } from "react-popper";
 import { TransactionReceipt } from "web3-core";
-var gtag: any = require("ga-gtag");
 
 const SendMeEther = () => {
   const [provider, setProvider] = useState<any>(null);
@@ -48,11 +47,7 @@ const SendMeEther = () => {
         from: netConfig.account,
         value: netConfig.web3.utils.toWei(etherInput, "ether"),
       })
-      .once("receipt", (reciept: TransactionReceipt) => {
-        gtag("event", "Sent a Donation", {
-          account: netConfig.account,
-        });
-      });
+      .once("receipt", (reciept: TransactionReceipt) => {});
   };
 
   const popper_address = usePopper(referenceElement, popperElement, {
@@ -103,9 +98,6 @@ const SendMeEther = () => {
         }));
 
         if (accounts[0]) {
-          gtag("event", "Linked Metamask", {
-            account: accounts[0],
-          });
         }
       }
     };
