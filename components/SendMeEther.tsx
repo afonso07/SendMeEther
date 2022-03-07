@@ -72,7 +72,7 @@ const SendMeEther = () => {
     setEtherFocused(false);
   });
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (etherFocused == false) {
       popper_address.update ? popper_address.update() : null;
     }
